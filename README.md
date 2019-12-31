@@ -70,3 +70,5 @@ This repository contains the source for many of the slack [slash commands ](http
 11. In slack on the General channel type `/util users`.  You should get a list of the current slack users, you should find the bot you just created there.  
 
     - Copy the UserId of the Bot User to .env
+
+12. Run `/util addbot` to add the bot to all existing channels.
