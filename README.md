@@ -45,6 +45,7 @@ This repository contains the source for many of the slack [slash commands ](http
     - click **[Install App to Workplace]**
     - copy `access token` to .env
     - copy `bot token` to .env
+    - restart app
 
 7. enable [event subscriptions](https://api.slack.com/apps/AS530JUKE/event-subscriptions?)
 
@@ -70,5 +71,6 @@ This repository contains the source for many of the slack [slash commands ](http
 11. In slack on the General channel type `/util users`.  You should get a list of the current slack users, you should find the bot you just created there.  
 
     - Copy the UserId of the Bot User to .env
+    - restart app
 
 12. Run `/util addbot` to add the bot to all existing channels.
