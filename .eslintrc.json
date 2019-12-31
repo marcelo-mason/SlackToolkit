@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "standard",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+  },
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
+  }
+}

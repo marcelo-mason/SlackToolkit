@@ -1,0 +1,26 @@
+patch-package
+--- a/node_modules/slack/src/api.json
++++ b/node_modules/slack/src/api.json
+@@ -96,13 +96,11 @@
+   "chat.postEphemeral": [
+     "token",
+     "channel",
+-    "text",
+     "user"
+   ],
+   "chat.postMessage": [
+     "token",
+-    "channel",
+-    "text"
++    "channel"
+   ],
+   "chat.unfurl": [
+     "token",
+@@ -113,7 +111,6 @@
+   "chat.update": [
+     "token",
+     "channel",
+-    "text",
+     "ts"
+   ],
+   "conversations.archive": [
