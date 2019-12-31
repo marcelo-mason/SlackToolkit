@@ -28,9 +28,15 @@ This repository contains the source for many of the slack [slash commands ](http
 3. create a [slack app](https://api.slack.com/apps?new_app=1)
     - copy **Signing Secret** over to .env
 
-4. create a [bot user](https://api.slack.com/apps/AS530JUKE/bots?)
+4. create a bot user
+    > Bot Users
 
-5. add [scope permissions](https://api.slack.com/apps/AS530JUKE/oauth?) to bot 
+    - Set Display name
+    - Set username
+
+5. add scope permissions to bot 
+
+    > OAuth & Permissions
 
     - add `channels:read`
     - add `channels:write`
@@ -41,18 +47,25 @@ This repository contains the source for many of the slack [slash commands ](http
     - add `users:read`
     - add `chat:write:bot`
 
-6. [install app to workplace](https://api.slack.com/apps/AS530JUKE/oauth)
+6. install app to workplace
+
+    > OAuth & Permissions
+
     - click **[Install App to Workplace]**
     - copy `access token` to .env
     - copy `bot token` to .env
     - restart app
 
-7. enable [event subscriptions](https://api.slack.com/apps/AS530JUKE/event-subscriptions?)
+7. enable event subscriptions
+
+    > Event Subscriptions
 
     - add Request URL:  `https://xxxxxx.ngrok.io/events`
     - subscribe to the workspace event: `channel_created` event
 
-9. add [slash command](https://api.slack.com/apps/AS530JUKE/slash-commands?)
+9. add slash command
+
+    > Slash Commands
     
     Command: `/channel`
 
@@ -60,7 +73,9 @@ This repository contains the source for many of the slack [slash commands ](http
 
     Short Description:  `Channel command`
 
-10. add [slash command](https://api.slack.com/apps/AS530JUKE/slash-commands?)
+10. add slash command
+
+    > Slash Commands
     
     Command: `/util`
 
