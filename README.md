@@ -89,3 +89,7 @@ This repository contains the source for many of the slack [slash commands ](http
     - restart app
 
 12. Run `/util addbot` to add the bot to all existing channels.
+
+done.
+
+The commands `/channel` and `/util` should now be fully working.  The bot user should now get added automatically when a channel is created as well.
