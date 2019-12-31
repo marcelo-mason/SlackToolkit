@@ -1,7 +1,5 @@
 # Slack Toolkit
 
-This repository contains the source for many of the slack [slash commands ](https://api.slack.com/slash-commands) used in the Private Presales Slack group.
-
 ## Getting Started
 
 1. install the dependencies
