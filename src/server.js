@@ -33,12 +33,3 @@ process.on('unhandledRejection', (reason, p) => {
 })
 
 console.log('* running')
-
-/***
- 
-  RUN ONCE
- 
-;(async () => {
-  await slack.inviteBotToAllChannels()
-})()
-*/

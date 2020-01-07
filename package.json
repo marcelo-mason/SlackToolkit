@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "patch-package && node src/server.js",
+    "build": "mkdir -p public && touch public/index.html",
     "dev": "npm run build && node dist/src/server.js",
     "pretest": "eslint --ignore-path .gitignore .",
     "reformat": "eslint --fix '{,!(dist)/**/}*.js'"
