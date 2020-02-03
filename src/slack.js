@@ -36,7 +36,8 @@ class SlackBot {
     try {
       const groups = await this.access.groups.list({})
       const channels = await this.access.channels.list({})
-      const list = [...groups.groups, ...channels.channels]
+      const groups2 = await this.bot.groups.list({})
+      const list = [...groups.groups, ...channels.channels, ...groups.groups2]
       return list
     } catch (err) {
       console.log('* getAllChannels', err.message)
