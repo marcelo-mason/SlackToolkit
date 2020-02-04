@@ -1,4 +1,5 @@
 const async = require('awaitable-async')
+const _ = require('lodash')
 const slack = require('../slack')
 
 class Channel {
@@ -93,11 +94,13 @@ class Channel {
       channel = await slack.createChannel(channelName)
     }
 
-    const users = await slack.getAllUsers()
-    await async.each(users, async user => {
-      await slack.invite(channel, user.id)
-    })
-
+    const users = (await slack.getAllUsers()).map(u => u.id)    
+    const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
+    _.remove(users, x => {
+      return _.indexOf(alreadyIn, x) !== -1
+    });
+    await slack.inviteBatch(channel, users)
+    
     await slack.postEphemeral(sender, `Channel ${channelName} created`)
   }
 
@@ -106,14 +109,12 @@ class Channel {
    */
   async fill(sender) {
     const channel = await slack.getChannel(sender.channel)
+    const users = (await slack.getAllUsers()).map(u => u.id)
     const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
-    const users = await slack.getAllUsers()
-    await async.each(users, async u => {
-      if (alreadyIn.indexOf(u.id) > -1) {
-        return
-      }
-      await slack.invite(channel, u.id)
-    })
+    _.remove(users, x => {
+      return _.indexOf(alreadyIn, x) !== -1
+    });
+    await slack.inviteBatch(channel, users)
 
     await slack.postEphemeral(sender, 'Channel filled')
   }
@@ -127,10 +128,13 @@ class Channel {
       return 'Channel not found'
     }
 
-    const users = await slack.getChannelUsers(channel)
-    await async.each(users, async user => {
-      await slack.invite(targetChannel, user.id)
-    })
+    const users = await slack.getChannelUsers(channel).map(u => u.id)
+    const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
+    _.remove(users, x => {
+      return _.indexOf(alreadyIn, x) !== -1
+    });
+    await slack.inviteBatch(targetChannel, users)
+
     await slack.postEphemeral(sender, 'Channel mirrored')
   }
 
@@ -157,9 +161,8 @@ class Channel {
   async invite(sender, idsString) {
     const channel = await slack.getChannel(sender.channel)
     const ids = idsString.trim().split(',')
-    await async.each(ids, async id => {
-      await slack.invite(channel, id)
-    })
+    
+    await slack.inviteBatch(channel, ids)
   }
 
   /**
@@ -172,15 +175,12 @@ class Channel {
       return
     }
 
-    const globalUsers = process.env.GLOBAL_USER_LIST.split(',')
-
     const users = await slack.getAllUsers(true, true)
+
     await async.each(users, async user => {
-      if (globalUsers.indexOf(user.id) > -1) {
-        return
-      }
       await slack.kick(channel, user.id)
     })
+    await slack.postEphemeral(sender, 'Channel emptied')
   }
 }
 

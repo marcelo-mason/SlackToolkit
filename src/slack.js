@@ -82,22 +82,14 @@ class SlackBot {
    */
   async getChannelMembers(id) {
     try {
-      const channel = await this.getChannel(id)
-      if (!channel) {
-        return
-      }
-      let members = []
-      if (channel.members.length) {
-        members = channel.members
-      }
       const chan = await this.access.conversations.members({
         channel: id,
         limit: 500
       })
-      if (chan && chan.members.length > members.length) {
-        members = chan.members
+      if (chan && chan.members.length) {
+        return chan.members
       }
-      return members
+      return []
     } catch (err) {
       console.log('* getChannelMembers', err.message)
     }
@@ -132,7 +124,7 @@ class SlackBot {
       console.log('* getChannelUsers', err.message)
     }
   }
-
+  
   /**
    * If user is in a channel
    */
@@ -185,6 +177,38 @@ class SlackBot {
   }
 
   /**
+   * Invites users to a channel or group
+   */
+  async inviteBatch(channel, users) {
+    if (typeof channel === 'string') {
+      channel = await this.getChannel(channel)
+      if (!channel) {
+        return
+      }
+    }
+
+    if (typeof users !== 'string') {
+      users = users.join(',')
+    }
+
+    try {
+        await this.access.conversations.invite({ channel: channel.id, users})      
+    } catch (err) {
+      if (err.message === 'cant_invite_self') {
+        if (!channel.is_group) {
+          try {
+            await this.access.channels.join({
+              name: `#${channel.name}`
+            })
+          } catch (e) {}
+        }
+      } else if (err.message !== 'already_in_channel') {
+        console.log('* invite', err.message)
+      }
+    }
+  }
+
+  /**
    * Invites a user to a channel or group
    */
   async invite(channel, userId) {
@@ -224,11 +248,7 @@ class SlackBot {
       channel = await this.getChannel(channel)
     }
     try {
-      if (channel.is_group) {
-        await this.access.groups.kick({ channel: channel.id, user: userId })
-      } else {
-        await this.access.channels.kick({ channel: channel.id, user: userId })
-      }
+      await this.access.conversations.kick({ channel: channel.id, user: userId })
     } catch (err) {
       if (err.message !== 'not_in_channel' && err.message !== 'cant_kick_self') {
         console.log('* kick', err.message)
