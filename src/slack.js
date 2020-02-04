@@ -34,11 +34,12 @@ class SlackBot {
    */
   async getAllChannels() {
     try {
-      const groups = await this.access.groups.list({})
-      const channels = await this.access.channels.list({})
-      const groups2 = await this.bot.groups.list({})
-      const list = [...groups.groups, ...channels.channels, ...groups2.groups]
-      return list
+      const chans = await this.access.conversations.list({
+        types: 'public_channel,private_channel',
+        exclude_archived: true,
+        limit: 1000
+      })
+      return [...chans.channels]
     } catch (err) {
       console.log('* getAllChannels', err.message)
     }

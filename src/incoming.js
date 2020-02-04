@@ -19,8 +19,9 @@ class SlackIncoming {
    */
   listen() {
     // invite bot on channel create
-    this.slackEvents.on('channel_created', e => {
+    this.slackEvents.on('channel_created', e => {      
       slack.invite(e.channel, process.env.SLACK_BOT_USER)
+      console.log('channel_created', e.channel.name)
     })
   }
 }
