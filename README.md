@@ -36,14 +36,30 @@
 
     > OAuth & Permissions
 
+    #### Bot Token Scopes
+    - add `channels:manage`
+    - add `commands`
+
+    #### User Token Scopes
+
+    - add `users:read`
+    - add `channels:history`
     - add `channels:read`
     - add `channels:write`
-    - add `channels:history`
+    
+    > To use the bots inside private channels
+
+    - add `groups:history`
     - add `groups:read`
     - add `groups:write`
-    - add `groups:history`
-    - add `users:read`
-    - add `chat:write:bot`
+
+    > To use the bots inside multi-user DMs
+
+    - add `im:history`
+    - add `im:read`
+    - add `im:write`
+
+    > Note:  The bot adds itself to all new public channels created so you can have the functionality instantly available.  You will need to manually `/invite` the bot user to private channels and DMs where you want to use the bot.  Slack prevents bots from adding themselves to non-public chats.
 
 6. install app to workplace
 
@@ -91,3 +107,5 @@
 done.
 
 The commands `/channel` and `/util` should now be fully working.  The bot user should now get added automatically when a channel is created as well.
+
+Run `/util addbot` if you want to add the bot to all existing public channels.

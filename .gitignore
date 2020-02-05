@@ -7,3 +7,4 @@ extra.json
 yarn.lock
 .DS_Store
 package-lock.json
+.cmd

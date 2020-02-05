@@ -151,25 +151,18 @@ class SlackBot {
   /**
    * Creates a new channel
    */
-  async createChannel(name) {
-    try {
-      const res = await this.access.channels.create({ name })
-      if (res) {
-        return res.channel
-      }
-    } catch (err) {
-      console.log('* createChannel', err.message)
+  async createChannel(name, users, priv) {
+    if (users && typeof users !== 'string') {
+      users = users.join(',')
     }
-  }
-
-  /**
-   * Creates a new groupl
-   */
-  async createGroup(name) {
     try {
-      const res = await this.access.groups.create({ name })
-      if (res) {
-        return res.group
+      const res = await this.access.conversations.create({
+         name,
+         is_private: priv,
+         user_ids: users
+      })
+      if (res){
+        return res.channel
       }
     } catch (err) {
       console.log('* createGroup', err.message)
@@ -179,7 +172,7 @@ class SlackBot {
   /**
    * Invites users to a channel or group
    */
-  async inviteBatch(channel, users) {
+  async invite(channel, users) {
     if (typeof channel === 'string') {
       channel = await this.getChannel(channel)
       if (!channel) {
@@ -192,39 +185,7 @@ class SlackBot {
     }
 
     try {
-        await this.access.conversations.invite({ channel: channel.id, users})      
-    } catch (err) {
-      if (err.message === 'cant_invite_self') {
-        if (!channel.is_group) {
-          try {
-            await this.access.channels.join({
-              name: `#${channel.name}`
-            })
-          } catch (e) {}
-        }
-      } else if (err.message !== 'already_in_channel') {
-        console.log('* invite', err.message)
-      }
-    }
-  }
-
-  /**
-   * Invites a user to a channel or group
-   */
-  async invite(channel, userId) {
-    if (typeof channel === 'string') {
-      channel = await this.getChannel(channel)
-      if (!channel) {
-        return
-      }
-    }
-
-    try {
-      if (channel.is_group) {
-        await this.access.groups.invite({ channel: channel.id, user: userId })
-      } else {
-        await this.access.channels.invite({ channel: channel.id, user: userId })
-      }
+        await this.access.conversations.invite({ channel: channel.id, users})
     } catch (err) {
       if (err.message === 'cant_invite_self') {
         if (!channel.is_group) {

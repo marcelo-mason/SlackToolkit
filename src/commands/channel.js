@@ -1,6 +1,7 @@
 const async = require('awaitable-async')
 const _ = require('lodash')
 const slack = require('../slack')
+const cmdArgs = require('../cmdArgs')
 
 class Channel {
   /**
@@ -11,14 +12,14 @@ class Channel {
       return res.send('Sorry, you do not have access to this command.')
     }
 
+    cmdArgs.parse(args)
+    const flags = cmdArgs.flags
+    args = cmdArgs.args
+
     switch (cmd) {
       case 'create':
         res.send()
-        await this.create(sender, args.length ? args[0] : req.body.channel_name)
-        break
-      case 'full':
-        res.send()
-        await this.createAndFill(sender, args.length ? args[0] : req.body.channel_name)
+        await this.createChannel(sender, args[0], flags.p, flags.f)
         break
       case 'fill':
         res.send()
@@ -51,16 +52,12 @@ class Channel {
       case 'help':
       default:
         const help = [
-          '`/channel create [channel]` - Creates an empty channel',
-          '`/channel full [channel]` - Creates a channel and fills it with all users',
+          '`/channel create <-p> <-f> [channel]` - Creates an empty channel. (-p = private, -f = fill users)',
           '`/channel fill` - Fills the current channel with all users',
-          '`/channel empty` - Removes everyone from the current channel',
-          '`/channel remove-except [list]` - Removes everyone except listed and admins from the current channel',
-          '`/channel mirror [channel]` - Fills the current channel with users from another channel',
           '`/channel invite [list]` - Invites everyone on the list to the current channel',
+          '`/channel empty` - Removes everyone from the current channel',
+          '`/channel mirror [channel]` - Fills the current channel with users from another channel',
           '`/channel prune [list]` - Removes everyone *not* on the list from the current channel',
-          '`/channel lock [keyword]` - Locks a deal channel to contributors to the deals that match the keyword',
-          '`/channel funded-invite [@user]` - Invite user to all funded channels',
           '',
           '* Example of a valid user list: U78TKJHAL,U70GEE62D,U70QG8ZB5,U845M27A5'
         ]
@@ -77,31 +74,28 @@ class Channel {
   /**
    * Creates an empty channel
    */
-  async create(sender, channelName) {
+  async createChannel(sender, channelName, priv, fill) {
     let channel = await slack.getChannel(channelName)
     if (!channel) {
-      channel = await slack.createChannel(channelName)
-      await slack.postEphemeral(sender, `Channel ${channelName} created`)
+      channel = await slack.createChannel(channelName, sender.user, priv)
+      if (fill) {
+        if (priv){
+          await slack.postEphemeral(sender, `Cannot auto-fill private channels. Run \`/channel fill\` once you have added the bot to the channel.`)
+        } else {
+          const users = (await slack.getAllUsers()).map(u => u.id)
+          const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
+          _.remove(users, x => {
+            return _.indexOf(alreadyIn, x) !== -1
+          });
+        }
+      }
+      if (priv) {
+        const botUser = await slack.getUser(process.env.SLACK_BOT_USER)
+        await slack.postEphemeral(sender, `Private Channel ${channelName} created.\nCannot auto-add the bot to private channels. Type \`/invite @${botUser.real_name}\` inside the channel if you want access to the bot.`)
+      } else {
+        await slack.postEphemeral(sender, `Channel ${channelName} created`)
+      }
     }
-  }
-
-  /**
-   * Creates a channel and fills it
-   */
-  async createAndFill(sender, channelName) {
-    let channel = await slack.getChannel(channelName)
-    if (!channel) {
-      channel = await slack.createChannel(channelName)
-    }
-
-    const users = (await slack.getAllUsers()).map(u => u.id)    
-    const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
-    _.remove(users, x => {
-      return _.indexOf(alreadyIn, x) !== -1
-    });
-    await slack.inviteBatch(channel, users)
-    
-    await slack.postEphemeral(sender, `Channel ${channelName} created`)
   }
 
   /**
@@ -114,8 +108,7 @@ class Channel {
     _.remove(users, x => {
       return _.indexOf(alreadyIn, x) !== -1
     });
-    await slack.inviteBatch(channel, users)
-
+    await slack.invite(channel, users)
     await slack.postEphemeral(sender, 'Channel filled')
   }
 
@@ -133,7 +126,7 @@ class Channel {
     _.remove(users, x => {
       return _.indexOf(alreadyIn, x) !== -1
     });
-    await slack.inviteBatch(targetChannel, users)
+    await slack.invite(targetChannel, users)
 
     await slack.postEphemeral(sender, 'Channel mirrored')
   }
@@ -145,7 +138,10 @@ class Channel {
     const channel = await slack.getChannel(sender.channel)
     const users = await slack.getChannelUsers(channel)
     const ids = idsString.trim().split(',')
-    await async.each(users, async user => {
+    await async.each(users, async user => {      
+      if (user.id === sender.user || user.id === process.env.SLACK_BOT_USER){
+        return
+      }
       if (ids.indexOf(user.id) < 0 && !user.is_admin) {
         await slack.kick(channel, user.id)
         console.log('kicking', user.name)
@@ -159,10 +155,8 @@ class Channel {
    * Invite by bulk userids
    */
   async invite(sender, idsString) {
-    const channel = await slack.getChannel(sender.channel)
-    const ids = idsString.trim().split(',')
-    
-    await slack.inviteBatch(channel, ids)
+    const channel = await slack.getChannel(sender.channel)    
+    await slack.invite(channel, idsString)
   }
 
   /**
@@ -178,6 +172,9 @@ class Channel {
     const users = await slack.getAllUsers(true, true)
 
     await async.each(users, async user => {
+      if (user.id === sender.user || user.id === process.env.SLACK_BOT_USER){
+        continue
+      }
       await slack.kick(channel, user.id)
     })
     await slack.postEphemeral(sender, 'Channel emptied')
