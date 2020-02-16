@@ -120,9 +120,9 @@ Run `/util addbot` if you want to add the bot to all existing public channels.
 
 ## NDA Upload
 
-1. Create a private channel where members will upload the NDAs (can be named anything) e.g. `/channel create -p _access`
+1. Create a channel where members will upload the NDAs e.g. _access, or use an existing channel e.g. announcements
 
-2. Run `/util channels` to find the chanelId of that new channel.  
+2. Run `/util channels` to find the chanelId of that channel.  
 
 3. Copy the Id to the .env `NDAUPLOAD_CHANNEL_ID`
 
