@@ -124,7 +124,7 @@ class SlackBot {
       console.log('* getChannelUsers', err.message)
     }
   }
-  
+
   /**
    * If user is in a channel
    */
@@ -157,11 +157,11 @@ class SlackBot {
     }
     try {
       const res = await this.access.conversations.create({
-         name,
-         is_private: priv,
-         user_ids: users
+        name,
+        is_private: priv,
+        user_ids: users
       })
-      if (res){
+      if (res) {
         return res.channel
       }
     } catch (err) {
@@ -185,7 +185,7 @@ class SlackBot {
     }
 
     try {
-        await this.access.conversations.invite({ channel: channel.id, users})
+      await this.access.conversations.invite({ channel: channel.id, users })
     } catch (err) {
       if (err.message === 'cant_invite_self') {
         if (!channel.is_group) {
@@ -193,7 +193,7 @@ class SlackBot {
             await this.access.channels.join({
               name: `#${channel.name}`
             })
-          } catch (e) {}
+          } catch (e) { }
         }
       } else if (err.message !== 'already_in_channel') {
         console.log('* invite', err.message)
@@ -316,7 +316,7 @@ class SlackBot {
         channel,
         ts
       }
-      return await this.bot.chat.delete(payload)
+      return await this.access.chat.delete(payload)
     } catch (err) {
       console.log('* deleteMessage', err.message)
     }
@@ -399,6 +399,47 @@ class SlackBot {
     } catch (err) {
       console.log('* postEphemeral', err.message)
     }
+  }
+
+  /**
+   * Deletes a file
+   */
+  async deleteFile(file) {
+    try {
+      return this.access.files.delete({ file })
+    } catch (err) {
+      console.log('* deleteFile', err.message)
+    }
+  }
+
+  /**
+   * Get file info
+   */
+  async getFile(fileId) {
+    try {
+      return (await this.access.files.info({ file: fileId })).file
+    } catch (err) {
+      console.log('* getFile', err.message)
+    }
+  }
+
+  /**
+   * Get files list
+   */
+  async getFileList(channel, types, user) {
+    try {
+      const list = await this.access.files.list({
+        channel,
+        count: 1000,
+        types
+      })
+      if (list) {
+        return list.files
+      }
+    } catch (err) {
+      console.log('* getFile', err.message)
+    }
+    return []
   }
 }
 

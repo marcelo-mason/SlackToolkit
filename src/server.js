@@ -13,15 +13,15 @@ const app = express()
 const command = require('./command')
 const channel = require('./commands/channel')
 const util = require('./commands/util')
-const incoming = require('./incoming')
-const slack = require('./slack')
+const slackIncoming = require('./slackIncoming')
+const ndaUpload = require('./ndaUpload')
 
 // route
 app.route('/channel').post(parser, command.bind(channel))
 app.route('/util').post(parser, command.bind(util))
 
 // listen to slack events
-app.use('/events', incoming.events.requestListener())
+app.use('/events', slackIncoming.events.requestListener())
 
 // start api
 const port = process.env.PORT || 3000
@@ -32,4 +32,4 @@ process.on('unhandledRejection', (reason, p) => {
   console.log(p)
 })
 
-console.log('* running')
+console.log('* Running')
