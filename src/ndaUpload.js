@@ -43,7 +43,8 @@ class NDAUpload {
   }
 
   async hasBeenModified(name, size) {
-    const list = await slack.getFileList(this.ndaChan, 'pdfs')
+    let list = await slack.getFileList(this.ndaChan, 'pdfs')
+    list = _.orderBy(list, ['created'], ['asc']);
     const found = _.find(list, x => x.name === name);
     return found.size != size
   }
@@ -54,7 +55,6 @@ class NDAUpload {
       const file = await slack.getFile(fileId)
       const data = await download(file.url_private)
       await slack.deleteFile(fileId)
-
 
       const [fileName, ext] = file.name.split('.')
       const [project] = fileName.split('-')

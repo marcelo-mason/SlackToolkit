@@ -120,13 +120,15 @@ Run `/util addbot` if you want to add the bot to all existing public channels.
 
 ## NDA Upload
 
-1. Create a private channel where members will upload the NDAs (can be named anything) e.g. `/channel create -p _NDAs`
+1. Create a private channel where members will upload the NDAs (can be named anything) e.g. `/channel create -p _access`
 
 2. Run `/util channels` to find the chanelId of that new channel.  
 
 3. Copy the Id to the .env `NDAUPLOAD_CHANNEL_ID`
 
 4. Run `/util users` and copy the userId(s) of admins who will be pasting the blank NDAs into the chan into  the .env `NDAUPLOAD_ADMINS`.  One or more, comma separated, no spaces. Note: These admin(s) will not be able to upload the filled NDAs into this chan like the rest of the members.
+
+5. Set the topic to the chan with simple instructions e.g.:  Download the NDA pdf, sign, and upload back to the channel.  Do not rename.
 
 ### Dropbox Setup
 
@@ -144,15 +146,15 @@ Run `/util addbot` if you want to add the bot to all existing public channels.
 
 ### How to use
 
-1. Create a new private channel that requires NDA in the format `dd-[project]` e.g. `/channel create -p dd-spacex`
+1. Create a new private channel in the format `dd-[project]` e.g. `/channel create -p dd-spacex`
 
-2. Invite the bot to that channel e.g. `/invite @Add`
+2. Invite the bot to that channel e.g. `/invite @[Bot Name]`
 
 3. Rename your blank NDA document in the format `[project]-<anything>.pdf` e.g. SpaceX-NDA.pdf or SpaceX.pdf
 
-   > Note: the `[project]` part must match the `[project]` part of the channel name. Case is not important.
+   > Note: the `[project]` part must match the `[project]` part of the channel name. Case insensitive.
 
-4. Post the blank NDA document to the `_NDAs` channel created in the `NDA Upload` section, along with instructions to fill the document and upload the file in the same channel by drag-drop or using the paperclip icon.
+4. Post the blank NDA document to the `_access` channel created in the `NDA Upload` section, along with instructions to fill the document and upload the file in the same channel by drag-drop or using the paperclip icon.
 
-5. The bot will detect the file upload, will verify it has not been renamed, will verify that it has been modified from the original, if it passes both it will upload it to the dropbox account (renamed to the format [/project/username.pdf]), delete it from slack, and then invite the user to the dd chan that matches the project name.
+5. The bot will detect the file upload, will verify that it has been modified from the original by checking file size, then it will upload it to the dropbox account (renamed to the format [/project/username.pdf]), delete it from slack, and then invite the user to the dd chan that matches the project name.
 
