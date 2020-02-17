@@ -26,6 +26,7 @@ class NDAUpload {
           if (!this.isNDAAdmin(e.user)) {
             if (this.isNDAPdf(e.files[0])) {
               await slack.deleteMessage(e.channel, e.ts)
+              await slack.postEphemeral({ channel: e.channel, user: e.user }, `:inbox_tray: NDA Document received.`)
             }
           }
         }
