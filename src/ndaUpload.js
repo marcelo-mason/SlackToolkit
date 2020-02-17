@@ -103,7 +103,7 @@ class NDAUpload {
           await slack.invite(privChan, userId)
           await slack.postEphemeral({ channel, user: userId }, `:unlock: You have been granted access to the *#dd-${project}* channel.`)
         } else {
-          await slack.postEphemeral({ channel, user: userId }, `:white_check_mark: NDA has been re-submitted successfully.`)
+          await slack.postEphemeral({ channel, user: userId }, `:heavy_check_mark: NDA has been re-submitted successfully.`)
         }
       } else {
         await slack.postEphemeral({ channel, user: userId }, `:skull: There was an error processing the file, please contact admin.`)
