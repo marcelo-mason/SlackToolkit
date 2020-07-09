@@ -79,19 +79,26 @@ class Channel {
     if (!channel) {
       channel = await slack.createChannel(channelName, sender.user, priv)
       if (fill) {
-        if (priv){
-          await slack.postEphemeral(sender, `Cannot auto-fill private channels. Run \`/channel fill\` once you have added the bot to the channel.`)
+        if (priv) {
+          await slack.postEphemeral(
+            sender,
+            `Cannot auto-fill private channels. Run \`/channel fill\` once you have added the bot to the channel.`
+          )
         } else {
-          const users = (await slack.getAllUsers()).map(u => u.id)
-          const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
-          _.remove(users, x => {
+          const users = (await slack.getAllUsers()).map((u) => u.id)
+          const alreadyIn = (await slack.getChannelUsers(channel)).map((u) => u.id)
+          _.remove(users, (x) => {
             return _.indexOf(alreadyIn, x) !== -1
-          });
+          })
+          await slack.invite(channel, users)
         }
       }
       if (priv) {
         const botUser = await slack.getUser(process.env.SLACK_BOT_USER)
-        await slack.postEphemeral(sender, `Private Channel ${channelName} created.\nCannot auto-add the bot to private channels. Type \`/invite @${botUser.real_name}\` inside the channel if you want access to the bot.`)
+        await slack.postEphemeral(
+          sender,
+          `Private Channel ${channelName} created.\nCannot auto-add the bot to private channels. Type \`/invite @${botUser.real_name}\` inside the channel if you want access to the bot.`
+        )
       } else {
         await slack.postEphemeral(sender, `Channel ${channelName} created`)
       }
@@ -103,13 +110,12 @@ class Channel {
    */
   async fill(sender) {
     const channel = await slack.getChannel(sender.channel)
-    const users = (await slack.getAllUsers()).map(u => u.id)
-    const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
-    _.remove(users, x => {
+    const users = (await slack.getAllUsers()).map((u) => u.id)
+    const alreadyIn = (await slack.getChannelUsers(channel)).map((u) => u.id)
+    _.remove(users, (x) => {
       return _.indexOf(alreadyIn, x) !== -1
-    });
+    })
     await slack.invite(channel, users)
-    await slack.postEphemeral(sender, 'Channel filled')
   }
 
   /**
@@ -121,11 +127,11 @@ class Channel {
       return 'Channel not found'
     }
 
-    const users = await slack.getChannelUsers(channel).map(u => u.id)
-    const alreadyIn = (await slack.getChannelUsers(channel)).map(u => u.id)
-    _.remove(users, x => {
+    const users = await slack.getChannelUsers(channel).map((u) => u.id)
+    const alreadyIn = (await slack.getChannelUsers(channel)).map((u) => u.id)
+    _.remove(users, (x) => {
       return _.indexOf(alreadyIn, x) !== -1
-    });
+    })
     await slack.invite(targetChannel, users)
 
     await slack.postEphemeral(sender, 'Channel mirrored')
@@ -138,8 +144,8 @@ class Channel {
     const channel = await slack.getChannel(sender.channel)
     const users = await slack.getChannelUsers(channel)
     const ids = idsString.trim().split(',')
-    await async.each(users, async user => {      
-      if (user.id === sender.user || user.id === process.env.SLACK_BOT_USER){
+    await async.each(users, async (user) => {
+      if (user.id === sender.user || user.id === process.env.SLACK_BOT_USER) {
         return
       }
       if (ids.indexOf(user.id) < 0 && !user.is_admin) {
@@ -155,7 +161,7 @@ class Channel {
    * Invite by bulk userids
    */
   async invite(sender, idsString) {
-    const channel = await slack.getChannel(sender.channel)    
+    const channel = await slack.getChannel(sender.channel)
     await slack.invite(channel, idsString)
   }
 
@@ -171,8 +177,8 @@ class Channel {
 
     const users = await slack.getAllUsers(true, true)
 
-    await async.each(users, async user => {
-      if (user.id === sender.user || user.id === process.env.SLACK_BOT_USER){
+    await async.each(users, async (user) => {
+      if (user.id === sender.user || user.id === process.env.SLACK_BOT_USER) {
         continue
       }
       await slack.kick(channel, user.id)

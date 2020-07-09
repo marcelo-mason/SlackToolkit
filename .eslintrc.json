@@ -1,14 +1,18 @@
 {
-  "extends": [
-    "standard",
-    "plugin:prettier/recommended"
-  ],
-  "rules": {
+  "env": {
+    "browser": true,
+    "es2020": true,
+    "node": true,
+    "mongo": true
   },
+  "extends": ["standard", "prettier"],
   "parserOptions": {
-    "ecmaVersion": 2017,
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true
-    }
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "rules": {
+    "handle-callback-err": 0,
+    "space-before-function-paren": "off",
+    "import/first": "off"
   }
 }
