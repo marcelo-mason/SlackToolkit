@@ -22,7 +22,7 @@ class SlackIncoming {
    */
   eventsListen() {
     // invite bot on channel create
-    this.slackEvents.on('channel_created', (e) => {      
+    this.slackEvents.on('channel_created', async (e) => {
       if (!e.channel.is_private) {
         // invite bot
         if (!this.botUserId) {
