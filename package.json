@@ -10,7 +10,6 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "postinstall": "patch-package",
     "build": "mkdir -p public && touch public/index.html",
     "dev": "npm run build && node dist/src/server.js",
     "pretest": "eslint --ignore-path .gitignore .",

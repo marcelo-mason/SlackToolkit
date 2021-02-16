@@ -1,4 +1,4 @@
-const slack = require('../slack/bot.old')
+const slack = require('../slack/bot')
 const _ = require('lodash')
 const async = require('awaitable-async')
 

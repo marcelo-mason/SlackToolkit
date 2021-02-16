@@ -1,4 +1,4 @@
-const slack = require('./slack')
+const slack = require('./slack/bot')
 
 module.exports = async function (req, res) {
   try {
