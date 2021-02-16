@@ -17,19 +17,18 @@
     "reformat": "eslint --fix '{,!(dist)/**/}*.js'"
   },
   "dependencies": {
-    "@slack/events-api": "^2.3.0",
-    "@slack/interactive-messages": "^1.4.1",
+    "@slack/events-api": "^2.3.3",
+    "@slack/interactive-messages": "^1.7.0",
+    "@slack/web-api": "^5.11.0",
     "awaitable-async": "0.0.6",
     "body-parser": "^1.19.0",
     "dotenv": "^4.0.0",
-    "dropbox": "^4.0.30",
     "express": "^4.16.2",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",
     "patch-package": "^6.2.0",
     "request": "^2.88.2",
-    "request-promise": "^4.2.5",
-    "slack": "11.0.2"
+    "request-promise": "^4.2.5"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

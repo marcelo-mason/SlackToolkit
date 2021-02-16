@@ -1,15 +1,16 @@
-const Slack = require('slack')
+const { WebClient, ErrorCode, retryPolicies } = require('@slack/web-api')
 const request = require('request')
 const _ = require('lodash')
 const async = require('awaitable-async')
 
 class SlackBot {
   constructor() {
-    this.access = new Slack({
-      token: process.env.SLACK_ACCESS_TOKEN
+    this.botUser = null
+    this.access = new WebClient(process.env.SL_SLACK_ACCESS_TOKEN, {
+      retryConfig: retryPolicies.fiveRetriesInFiveMinutes
     })
-    this.bot = new Slack({
-      token: process.env.SLACK_BOT_TOKEN
+    this.bot = new WebClient(process.env.SL_SLACK_BOT_TOKEN, {
+      retryConfig: retryPolicies.fiveRetriesInFiveMinutes
     })
     this.deletingConversationMessages = false
     this.deletingAllConversations = false
@@ -53,7 +54,7 @@ class SlackBot {
       const all = await this.getAllChannels()
       let found = _.find(all, { id: nameOrId })
       if (!found) {
-        found = _.find(all, channel => {
+        found = _.find(all, (channel) => {
           return channel.name.includes(nameOrId.replace('#', ''))
         })
       }
@@ -69,7 +70,7 @@ class SlackBot {
   async listChannels() {
     try {
       const chans = await this.getAllChannels()
-      chans.forEach(c => {
+      chans.forEach((c) => {
         console.log(c.id, c.name)
       })
     } catch (err) {
@@ -106,7 +107,7 @@ class SlackBot {
       return new Promise(async (resolve, reject) => {
         const users = []
         const members = await this.getChannelMembers(channel.id)
-        await async.eachSeries(members, async userId => {
+        await async.eachSeries(members, async (userId) => {
           const user = await this.getUser(userId)
           if (!includeRestricted) {
             if (user.profile.is_restricted) {
@@ -193,7 +194,7 @@ class SlackBot {
             await this.access.channels.join({
               name: `#${channel.name}`
             })
-          } catch (e) { }
+          } catch (e) {}
         }
       } else if (err.message !== 'already_in_channel') {
         console.log('* invite', err.message)
@@ -238,19 +239,19 @@ class SlackBot {
     try {
       const res = await this.access.users.list({})
       if (res) {
-        let out = res.members.filter(user => {
+        let out = res.members.filter((user) => {
           return user.id !== 'USLACKBOT'
         })
         if (!includeBots) {
-          out = out.filter(user => {
+          out = out.filter((user) => {
             return !user.is_bot
           })
         }
         if (!includeDeleted) {
-          out = out.filter(user => !user.deleted)
+          out = out.filter((user) => !user.deleted)
         }
         if (!includeRestricted) {
-          out = out.filter(user => !user.profile.is_restricted)
+          out = out.filter((user) => !user.profile.is_restricted)
         }
         return out
       }
@@ -344,7 +345,7 @@ class SlackBot {
     try {
       if (Array.isArray(text)) {
         const chunks = _.chunk(text, 100)
-        await async.eachSeries(chunks, async chunk => {
+        await async.eachSeries(chunks, async (chunk) => {
           await this.bot.chat.postEphemeral({
             ...sender,
             text: `\`\`\`${chunk.join('\n')}\`\`\``,
@@ -440,6 +441,28 @@ class SlackBot {
       console.log('* getFile', err.message)
     }
     return []
+  }
+
+  async getBotUserId() {
+    if (this.botUser) {
+      return this.botUser.user_id
+    }
+    const test = await this.bot.auth.test({})
+    if (test) {
+      this.botUser = test
+      return test.user_id
+    }
+  }
+
+  async getBotId() {
+    if (this.botUser) {
+      return this.botUser.bot_id
+    }
+    const test = await this.bot.auth.test({})
+    if (test) {
+      this.botUser = test
+      return test.bot_id
+    }
   }
 }
 

@@ -13,8 +13,7 @@ const app = express()
 const command = require('./command')
 const channel = require('./commands/channel')
 const util = require('./commands/util')
-const slackIncoming = require('./slackIncoming')
-const ndaUpload = require('./ndaUpload')
+const slackIncoming = require('./slack/incoming')
 
 // route
 app.route('/channel').post(parser, command.bind(channel))

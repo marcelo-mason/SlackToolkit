@@ -1,7 +1,11 @@
 const slack = require('./slack')
 
-module.exports = async function(req, res) {
+module.exports = async function (req, res) {
   try {
+    if (req.body.token !== process.env.SL_SLACK_VERIFICATION_TOKEN) {
+      return res.send('Invalid slack token')
+    }
+
     console.log('*', req.body.command, req.body.user_name)
     const user = await slack.getUser(req.body.user_id)
     const channel = await slack.getChannel(req.body.channel_id)

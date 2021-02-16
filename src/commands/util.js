@@ -1,4 +1,4 @@
-const slack = require('../slack')
+const slack = require('../slack/bot.old')
 const _ = require('lodash')
 const async = require('awaitable-async')
 
@@ -41,8 +41,8 @@ class Util {
    */
   async users(sender) {
     let users = await slack.getAllUsers(false, true, true)
-    users = _.orderBy(users, ['real_name'], ['asc']);
-    const bundle = users.map(u => {
+    users = _.orderBy(users, ['real_name'], ['asc'])
+    const bundle = users.map((u) => {
       let type = ''
       if (u.is_admin) {
         type = 'admin'
@@ -57,12 +57,12 @@ class Util {
   }
 
   /**
-    * Lists all slack channels and their ChannelIds
-    */
+   * Lists all slack channels and their ChannelIds
+   */
   async channels(sender) {
     let channels = await slack.getAllChannels()
-    channels = _.orderBy(channels, ['name'], ['asc']);
-    const bundle = channels.map(c => {
+    channels = _.orderBy(channels, ['name'], ['asc'])
+    const bundle = channels.map((c) => {
       if (c.is_archived || c.is_im || c.is_mpim) {
         return
       }
@@ -84,10 +84,10 @@ class Util {
    */
   async inviteBotToAllChannels(sender) {
     const channels = await slack.getAllChannels()
-    await async.each(channels, async c => {
+    await async.each(channels, async (c) => {
       try {
-        await slack.invite(c, process.env.SLACK_BOT_USER)
-      } catch (err) { }
+        await slack.invite(c, process.env.ST_SLACK_BOT_USER)
+      } catch (err) {}
     })
     await slack.postEphemeral(sender, 'Bot added to all channels')
   }
